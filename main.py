@@ -7,7 +7,7 @@ from dataset import Dataset
 from sklearn import svm
 
 
-def main():
+def train():
     dataset = Dataset('data/points')
     dataset.load()
     dataset.train_test_split(test_size=.2)
@@ -24,6 +24,10 @@ def video_inference(model_filename, video_path=None):
     cap = None
     if video_path:
         cap = cv2.VideoCapture(video_path)
+    else:
+        cap = cv2.VideoCapture(0)
+    dataset = Dataset('data/points')
+    dataset.load_labels()
     model = joblib.load(model_filename)
 
     while True:
@@ -32,18 +36,30 @@ def video_inference(model_filename, video_path=None):
         if not ret:
             break
         action_pic = ActionPicture(frame)
-        kepoints = action_pic.extract_keypoints()[0]
+        action_pic.extract_keypoints()
+        frame = action_pic.draw_keypoints()
 
-        frame = draw_keypoints(kepoints, frame)
-        kepoints = kepoints.reshape(1, 34)
-        print(model.predict(kepoints))
+        pred = model.predict(action_pic.person_list[0].flatten())[0]
+        print(dataset.labels[pred])
         cv2.imshow('Video Playback', frame)
         cv2.waitKey(1)
 
 
+def picture_inference(model_filename, img):
+    model = joblib.load(model_filename)
+    dataset = Dataset('data/points')
+    dataset.load_labels()
 
+    action_pic = ActionPicture(img)
+    action_pic.extract_keypoints()
+
+    pred = model.predict(action_pic.person_list[0].flatten())[0]
+    print(dataset.labels[pred])
 
 
 if __name__ == '__main__':
+    # train()
     dataset = Dataset('data/points')
-    dataset.add_all_images_to_category('standing', 'data/black_guy_dataset/standing')
+    dataset.add_all_images_to_category('2_standing', 'data/walk or run/walk_or_run_train/train/walk')
+    # video_inference('svm0.83')
+    picture_inference('svm0.83', 'data/walk or run/walk_or_run_train/train/walk/walk_12f08de0.png')

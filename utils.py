@@ -51,5 +51,13 @@ def show_keypoints(img, keypoints):
     plt.axis('off')
     plt.show()
 
+
+def show_with_matplotlib(img):
+    image_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    plt.imshow(image_rgb)
+    plt.axis('off')
+    plt.show()
+
+
 if __name__ == '__main__':
     create_dataset()
