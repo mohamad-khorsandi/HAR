@@ -9,6 +9,7 @@ class ActionPicture:
         self._img = img
         self.person_list = []
         self.bounding_box = None
+        self.acc_scores = []
 
     yolo_model = YOLO(utils.read_config('pose_estimation_model'))
 
@@ -19,6 +20,7 @@ class ActionPicture:
     def yolo_inference(self):
         res_list = self.yolo_model(self._img)[0]
         self.bounding_box = res_list.boxes.xyxy.numpy()
+        self.acc_scores = res_list.boxes.conf.numpy()
         for res in res_list:
             person = Person.from_yolo_res(res)
             self.person_list.append(person)
