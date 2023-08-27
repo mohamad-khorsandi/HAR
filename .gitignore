@@ -2,3 +2,6 @@
 !data/points/
 
 /.idea
+/models/yolov8n-pose.pt
+/models/svm_1_0.84
+/models/yolov8s-pose.pt
