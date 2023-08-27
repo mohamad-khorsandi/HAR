@@ -10,6 +10,7 @@ class ActionPicture:
     def __init__(self, img):
         self._img = img
         self.person_list = []
+        self.bounding_box = None
 
     @classmethod
     def from_path(cls, img_path):
@@ -17,6 +18,7 @@ class ActionPicture:
 
     def yolo_inference(self):
         res_list = yolo_model(self._img)[0]
+        self.bounding_box = res_list.boxes.xyxy.numpy()
         for res in res_list:
             person = Person.from_yolo_res(res)
             self.person_list.append(person)
