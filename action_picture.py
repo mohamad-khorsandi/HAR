@@ -1,62 +1,50 @@
 import cv2
-import numpy as np
-from matplotlib import pyplot as plt
 from ultralytics import YOLO
 import copy
-import utils
+from person import Person
+
+yolo_model = YOLO('models/yolov8s-pose.pt')
 
 
 class ActionPicture:
     def __init__(self, img):
         self._img = img
         self.person_list = []
-        self.no_person = False
 
     @classmethod
     def from_path(cls, img_path):
         return ActionPicture(cv2.imread(img_path))
 
-    def extract_keypoints(self):
-        model = YOLO('models/yolov8n-pose.pt')
-
-        res = model(self._img)[0]
-
-        for person in res:
-            self.person_list.append(Person(person.keypoints.xy.numpy()[0]))
+    def yolo_inference(self):
+        res_list = yolo_model(self._img)[0]
+        for res in res_list:
+            person = Person.from_yolo_res(res)
+            self.person_list.append(person)
 
     def save_keypoints(self, tar_path):
         if not self.person_list:
-            self.extract_keypoints()
+            self.yolo_inference()
 
         for i, person in enumerate(self.person_list):
             person.save_keypoints(tar_path + f'_p{i}')
 
     def draw_keypoints(self):
         if not self.person_list:
-            self.extract_keypoints()
-        pointy_img = copy.deepcopy(self._img)
+            self.yolo_inference()
 
         for person in self.person_list:
             for point in person.keypoints:
                 point = (int(round(point[0])), int(round(point[1])))
-                pointy_img = cv2.circle(pointy_img, point, 2, (0, 0, 255), -1)
+                self._img = cv2.circle(self._img, point, 2, (0, 0, 255), -1)
 
-        return pointy_img
+        return self._img
 
+    def draw_rectangle(self):
+        if not self.person_list:
+            self.yolo_inference()
+        for person in self.person_list:
+            self._img = cv2.rectangle(self._img, person.box_start_point, person.box_end_point, (255, 0, 0), 1)
 
-class Person:
-    def __init__(self, keypoints):
-        self.keypoints = keypoints
-
-    @classmethod
-    def load_person(cls, path):
-        keypoints = np.load(path)
-        return Person(keypoints)
-
-    def save_keypoints(self, tar_path):
-        np.save(tar_path, self.keypoints)
-
-    def flatten(self):
-        return self.keypoints.reshape(1, 34)
+        return self._img
 
 
