@@ -1,8 +1,8 @@
 import copy
 
+import cv2
 import joblib
 import numpy as np
-
 import utils
 
 
@@ -11,11 +11,11 @@ class Person:
         self.keypoints = keypoints
         self._feature_list = None
         self.action = None
-        if box_points is not list:
+        if box_points is not None:
             self.box_start_point = box_points[0:2]
             self.box_end_point = box_points[2:4]
 
-    action_recognition_model = joblib.load(utils.read_config('action_recognition_model'))
+    _action_recognition_model = joblib.load(utils.read_config('action_recognition_model'))
 
     @classmethod
     def from_yolo_res(self, yolo_res):
@@ -51,4 +51,19 @@ class Person:
     def predict_action(self):
         features = self.preprocess()
         features = features.reshape(1, -1)
-        self.action = self.action_recognition_model.predict(features)[0]
+        self.action = self._action_recognition_model.predict(features)[0]
+
+    def draw(self, img, keypoints=False, box=False):
+        frame = action_pic.draw_rectangle()
+        frame = action_pic.draw_keypoints()
+        frame = cv2.putText(frame, dataset.labels[person.action], person.box_start_point, cv2.FONT_HERSHEY_SIMPLEX, 1,
+                            (255, 0, 0), 1, cv2.LINE_AA)
+
+    def draw_rectangle(self, img):
+        return cv2.rectangle(img, self.box_start_point, self.box_end_point, (255, 0, 0), 1)
+
+    def draw_keypoints(self):
+        pass
+        # for
+        # point = (int(round(point[0])), int(round(point[1])))
+        # return cv2.circle(self._img, point, 2, (0, 0, 255), -1)

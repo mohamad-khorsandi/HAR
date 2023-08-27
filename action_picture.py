@@ -37,9 +37,7 @@ class ActionPicture:
             self.yolo_inference()
 
         for person in self.person_list:
-            for point in person.keypoints:
-                point = (int(round(point[0])), int(round(point[1])))
-                self._img = cv2.circle(self._img, point, 2, (0, 0, 255), -1)
+            pass
 
         return self._img
 
@@ -48,6 +46,6 @@ class ActionPicture:
             self.yolo_inference()
 
         for person in self.person_list:
-            self._img = cv2.rectangle(self._img, person.box_start_point, person.box_end_point, (255, 0, 0), 1)
+            pass
 
         return self._img
