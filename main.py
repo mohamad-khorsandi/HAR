@@ -10,7 +10,8 @@ from dataset import Dataset
 from sklearn import svm
 import numpy as np
 from model import Model
-
+from motrackers import IOUTracker
+from motrackers.utils import draw_tracks
 
 def train(model_dir):
     dataset = Dataset('data/points')
@@ -37,6 +38,13 @@ def video_inference(video_path=None):
     frame_count = 0
     cv2.namedWindow("Resized_Window", cv2.WINDOW_NORMAL)
     cv2.resizeWindow("Resized_Window", 1500, 2300)
+    tracker = IOUTracker(
+            max_lost=20,
+            iou_threshold=0.6,
+            min_detection_confidence=0.6,
+            max_detection_confidence=0.7,
+            tracker_output_format="mot_challenge",
+        )
 
     while True:
         ret, frame = cap.read()
@@ -46,6 +54,9 @@ def video_inference(video_path=None):
 
         action_pic = ActionPicture(frame)
         action_pic.yolo_inference()
+        bbox = (action_pic.box_start_point[0], action_pic.box_start_point[1], action_pic.box_end_point[0] - action_pic.box_start_point[0], action_pic.box_end_point[1] - action_pic.box_start_point[1] )
+        tracked_objects = tracker.update(bbox, detection_scores=action_pic.acc_scores, class_ids=np.zeros(len(action_pic.acc_scores)))
+        tracked_image = draw_tracks(frame, tracked_objects)
         if len(action_pic.person_list) == 0:
             continue
 
@@ -53,7 +64,7 @@ def video_inference(video_path=None):
             person.predict_action()
             person.draw()
 
-        cv2.imshow("Resized_Window", frame)
+        cv2.imshow("Resized_Window", tracked_image)
         cv2.waitKey(1)
 
 
