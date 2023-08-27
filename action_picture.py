@@ -19,6 +19,7 @@ class ActionPicture:
     def yolo_inference(self):
         res_list = self.yolo_model(self._img)[0]
         self.bounding_box = res_list.boxes.xyxy.numpy()
+
         for res in res_list:
             person = Person.from_yolo_res(res)
             self.person_list.append(person)
@@ -35,9 +36,7 @@ class ActionPicture:
             self.yolo_inference()
 
         for person in self.person_list:
-            for point in person.keypoints:
-                point = (int(round(point[0])), int(round(point[1])))
-                self._img = cv2.circle(self._img, point, 2, (0, 0, 255), -1)
+            pass
 
         return self._img
 
@@ -46,6 +45,6 @@ class ActionPicture:
             self.yolo_inference()
 
         for person in self.person_list:
-            self._img = cv2.rectangle(self._img, person.box_start_point, person.box_end_point, (255, 0, 0), 1)
+            pass
 
         return self._img

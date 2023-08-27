@@ -24,7 +24,7 @@ def train(model_dir):
     model.save(model_dir)
 
 
-def video_inference(model_filename, video_path=None):
+def video_inference(video_path=None):
     cap = None
     if video_path:
         cap = cv2.VideoCapture(video_path)
@@ -33,10 +33,8 @@ def video_inference(model_filename, video_path=None):
 
     dataset = Dataset('data/points')
     dataset.load_labels()
-    model = Model.from_file(model_filename)
 
     frame_count = 0
-
     cv2.namedWindow("Resized_Window", cv2.WINDOW_NORMAL)
     cv2.resizeWindow("Resized_Window", 1500, 2300)
 
@@ -53,9 +51,6 @@ def video_inference(model_filename, video_path=None):
 
         for person in action_pic.person_list:
             person.predict_action()
-            frame = action_pic.draw_rectangle()
-            frame = action_pic.draw_keypoints()
-            frame = cv2.putText(frame, dataset.labels[person.action], person.box_start_point, cv2.FONT_HERSHEY_SIMPLEX,1, (255, 0, 0), 1, cv2.LINE_AA)
 
         cv2.imshow("Resized_Window", frame)
         cv2.waitKey(1)
@@ -102,6 +97,6 @@ if __name__ == '__main__':
     # if not os.path.exists(video_path):
     #     trim_video('data/namaz.mp4', 60.0, 400.0, video_path)
 
-    video_inference('models/svm_2_0.85', video_path)
+    video_inference(video_path)
 
     # picture_inference('svm0.83', 'data/walk or run/walk_or_run_train/train/walk/walk_12f08de0.png')
