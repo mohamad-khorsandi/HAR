@@ -53,10 +53,16 @@ class Person:
         features = features.reshape(1, -1)
         self.action = self._action_recognition_model.predict(features)[0]
 
-    def draw(self, img, keypoints=False, box=False):
-        img = self.draw_rectangle(img)
-        img = self.draw_keypoints(img)
+    def draw(self, img, keypoints=False, box=False, text=None):
+        if keypoints:
+            img = self.draw_rectangle(img)
+        if box:
+            img = self.draw_keypoints(img)
 
+        if text:
+            return self.write_action(img, text)
+        else:
+            return img
 
     def draw_rectangle(self, img):
         return cv2.rectangle(img, self.box_start_point, self.box_end_point, (255, 0, 0), 1)
@@ -66,6 +72,6 @@ class Person:
             point = (int(round(point[0])), int(round(point[1])))
             return cv2.circle(img, point, 2, (0, 0, 255), -1)
 
-    def show_action(self, img, text, ):
-        frame = cv2.putText(img, dataset.labels[person.action], self.box_start_point, cv2.FONT_HERSHEY_SIMPLEX, 1,
+    def write_action(self, img, text):
+        return cv2.putText(img, text, self.box_start_point, cv2.FONT_HERSHEY_SIMPLEX, 1,
                             (255, 0, 0), 1, cv2.LINE_AA)
