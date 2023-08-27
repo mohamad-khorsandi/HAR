@@ -51,6 +51,7 @@ def video_inference(video_path=None):
 
         for person in action_pic.person_list:
             person.predict_action()
+            person.draw()
 
         cv2.imshow("Resized_Window", frame)
         cv2.waitKey(1)

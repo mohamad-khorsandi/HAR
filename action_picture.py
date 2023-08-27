@@ -35,8 +35,6 @@ class ActionPicture:
         if not self.person_list:
             self.yolo_inference()
 
-        for person in self.person_list:
-            pass
 
         return self._img
 
