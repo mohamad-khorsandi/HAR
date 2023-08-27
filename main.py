@@ -1,3 +1,4 @@
+import configparser
 import copy
 import os.path
 
@@ -9,7 +10,6 @@ from dataset import Dataset
 from sklearn import svm
 import numpy as np
 from model import Model
-import time
 
 
 def train(model_dir):
@@ -52,13 +52,10 @@ def video_inference(model_filename, video_path=None):
             continue
 
         for person in action_pic.person_list:
-            features = person.preprocess()
-            features = features.reshape(1, -1)
-            pred = model.predict(features)[0]
-
+            person.predict_action()
             frame = action_pic.draw_rectangle()
             frame = action_pic.draw_keypoints()
-            frame = cv2.putText(frame, dataset.labels[pred], person.box_start_point, cv2.FONT_HERSHEY_SIMPLEX,1, (255, 0, 0), 1, cv2.LINE_AA)
+            frame = cv2.putText(frame, dataset.labels[person.action], person.box_start_point, cv2.FONT_HERSHEY_SIMPLEX,1, (255, 0, 0), 1, cv2.LINE_AA)
 
         cv2.imshow("Resized_Window", frame)
         cv2.waitKey(1)

@@ -1,14 +1,21 @@
 import copy
 
+import joblib
 import numpy as np
+
+import utils
 
 
 class Person:
     def __init__(self, keypoints, box_points=None):
         self.keypoints = keypoints
         self._feature_list = None
-        self.box_start_point = box_points[0:2]
-        self.box_end_point = box_points[2:4]
+        self.action = None
+        if box_points is not list:
+            self.box_start_point = box_points[0:2]
+            self.box_end_point = box_points[2:4]
+
+    action_recognition_model = joblib.load(utils.read_config('action_recognition_model'))
 
     @classmethod
     def from_yolo_res(self, yolo_res):
@@ -41,4 +48,7 @@ class Person:
         self._feature_list = self._flatten()
         return self._feature_list
 
-
+    def predict_action(self):
+        features = self.preprocess()
+        features = features.reshape(1, -1)
+        self.action = self.action_recognition_model.predict(features)[0]
