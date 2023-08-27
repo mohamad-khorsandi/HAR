@@ -1,3 +1,4 @@
+import configparser
 import os.path
 import shutil
 from enum import Enum
@@ -6,20 +7,6 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 from ultralytics import YOLO
-
-
-# def create_dataset():
-#     with open('data/Human Action Recognition/Training_set.csv') as file:
-#         lines = file.readlines()[1:]
-#         for line in lines:
-#             line = line.strip()
-#             img_name = line.split(',')[0]
-#             img_path = f'data/Human Action Recognition/train/{img_name}'
-#             action = line.split(',')[1]
-#             dst_path = Actions.get_cat_dir(action)
-#             if dst_path is None:
-#                 continue
-#             shutil.copy(img_path, dst_path)
 
 
 def create_dataset(dataset_path, cat_list):
@@ -59,5 +46,7 @@ def show_with_matplotlib(img):
     plt.show()
 
 
-if __name__ == '__main__':
-    create_dataset()
+def read_config(key):
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    return config.get('setting', key)
