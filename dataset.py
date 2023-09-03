@@ -13,6 +13,16 @@ class Dataset:
         self._x = None
         self._y = None
 
+    @classmethod
+    def for_train(cls, dataset_path):
+        return Dataset(dataset_path)
+
+    @classmethod
+    def for_inference(cls, dataset_path):
+        dataset = Dataset(dataset_path)
+        dataset.load_labels()
+        return dataset
+
     def load(self):
         i = 0
         self._x = []
@@ -60,3 +70,6 @@ class Dataset:
             self.load_labels()
 
         return [self.labels[i] for i in range(len(self.labels))]
+
+    def id_to_label(self, cat_id):
+        return self.labels[cat_id]

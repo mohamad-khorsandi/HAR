@@ -6,37 +6,8 @@ from enum import Enum
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
+from moviepy.video.io.VideoFileClip import VideoFileClip
 from ultralytics import YOLO
-
-
-def create_dataset(dataset_path, cat_list):
-    for action in cat_list:
-        img_dir = os.path.join(dataset_path, action)
-        pnt_dir = action.get_point_dir()
-
-        for img_name in os.listdir(img_dir):
-            img = cv2.imread(os.path.join(img_dir, img_name))
-            points = get_keypoints(img)
-            tar_path = os.path.join(pnt_dir, img_name)
-            np.save(tar_path, points)
-
-
-def get_keypoints(img):
-    model = YOLO('yolov8n-pose.pt')
-
-    res = model(img)
-    return res[0].keypoints.xy.numpy()
-
-
-def show_keypoints(img, keypoints):
-    for person in keypoints:
-        for point in person:
-            point = (int(round(point[0])), int(round(point[1])))
-            img = cv2.circle(img, point, 2, (0, 0, 255), -1)
-
-    plt.imshow(img)
-    plt.axis('off')
-    plt.show()
 
 
 def show_with_matplotlib(img):
@@ -46,7 +17,8 @@ def show_with_matplotlib(img):
     plt.show()
 
 
-def read_config(key):
-    config = configparser.ConfigParser()
-    config.read('config.ini')
-    return config.get('setting', key)
+def trim_video(video_path, start_time, end_time, output_path):
+    clip = VideoFileClip(video_path)
+    subclip = clip.subclip(start_time, end_time)
+    subclip.write_videofile(output_path, codec='libx264')
+    clip.reader.close()
