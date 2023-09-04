@@ -46,10 +46,16 @@ class NNModel:
         self._model.save(path)
 
     def predict(self, x_test):
-        return self._model.predict(x_test)
+        pred_scores = self._model.predict(x_test)
+        pred_list = []
+        for score_list in pred_scores:
+            pred_list.append(score_list.argmax())
+
+        return pred_list
 
     def evaluate(self, x_test, y_test, class_names):
         y_pred = self.predict(x_test)
+
         self.accuracy = accuracy_score(y_test, y_pred)
         print("Accuracy:", self.accuracy)
 

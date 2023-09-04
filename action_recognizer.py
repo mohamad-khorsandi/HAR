@@ -4,7 +4,6 @@ from motrackers import IOUTracker
 from motrackers.utils import draw_tracks
 from person_history import PersonHistory
 import config
-import utils
 from action_picture import ActionPicture
 from dataset import Dataset
 
@@ -22,7 +21,7 @@ class ActionRecognizer:
             iou_threshold=0.3,
             min_detection_confidence=0.5,
             # max_detection_confidence=0.7,
-            tracker_output_format="visdrone_challenge",
+            # tracker_output_format="visdrone_challenge",
         )
 
     def video_inference(self, video_path=None):
@@ -37,7 +36,10 @@ class ActionRecognizer:
         while True:
             ret, frame = cap.read()
             frame_count += 1
-            if frame_count % 2 != 0 or not ret:
+            if not ret:
+                break
+
+            if frame_count % 2 != 0:
                 continue
 
             self.picture_inference(frame)

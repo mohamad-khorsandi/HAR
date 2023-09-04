@@ -2,9 +2,12 @@ import os.path
 
 import joblib
 from matplotlib import pyplot as plt
+from sklearn import svm
 
 from sklearn.metrics import accuracy_score, confusion_matrix
 import seaborn as sns
+from tensorflow import keras
+from tensorflow.keras import layers
 
 
 class Model:
@@ -14,8 +17,12 @@ class Model:
         self.conf_mat = None
 
     @classmethod
-    def from_file(cls, model_file_name):
+    def for_inference(cls, model_file_name):
         return Model(joblib.load(model_file_name))
+
+    @classmethod
+    def for_train(cls):
+        return Model(svm.SVC(kernel='rbf'))
 
     def fit(self, x_train, y_train):
         self._model.fit(x_train, y_train)
@@ -37,5 +44,4 @@ class Model:
         plt.xlabel('Predicted')
         plt.ylabel('Actual')
         plt.show()
-
 

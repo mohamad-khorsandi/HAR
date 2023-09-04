@@ -1,6 +1,7 @@
+import os.path
+
 import cv2
 from ultralytics import YOLO
-import utils
 from person import Person
 import config
 
@@ -25,3 +26,8 @@ class ActionPicture:
         for res in res_list:
             person = Person.for_inference(res)
             self.person_list.append(person)
+
+    def save_keypoints(self, base_path, img_id):
+        for person_id, person in enumerate(self.person_list):
+            cur_path = os.path.join(base_path, f'{img_id}_{person_id}')
+            person.save_keypoints(cur_path)

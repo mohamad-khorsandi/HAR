@@ -49,7 +49,7 @@ class Person:
     def preprocess(self):
         #todo check inplace of flatten
         self._feature_list = copy.copy(self.keypoints)
-        self._feature_list = self._loc_normalization()
+        # self._feature_list = self._loc_normalization()
         self._feature_list = self._max_normalization()
         self._feature_list = self._flatten()
         return self._feature_list

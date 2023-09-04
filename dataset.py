@@ -1,6 +1,5 @@
 import os
 from action_picture import ActionPicture, Person
-import cv2
 import numpy as np
 from sklearn.model_selection import train_test_split
 
@@ -53,11 +52,10 @@ class Dataset:
         if not os.path.exists(cat_path):
             raise Exception('category does not exist')
 
-        for img_name in os.listdir(image_dir):
+        for image_id, img_name in enumerate(os.listdir(image_dir)):
             action_pic = ActionPicture.from_path(os.path.join(image_dir, img_name))
             action_pic.yolo_inference()
-            tar_path = os.path.join(self.dataset_path, cat_name, img_name)
-            action_pic.save_keypoints(tar_path)
+            action_pic.save_keypoints(cat_path, image_id)
 
     def load_labels(self):
         for cat in os.listdir(self.dataset_path):
