@@ -1,11 +1,9 @@
 import copy
-
-
 import cv2
-import joblib
 import numpy as np
 import config
-
+import tensorflow as tf
+import os
 
 class Person:
     def __init__(self, keypoints):
@@ -16,7 +14,7 @@ class Person:
         self.box_start_point = None
         self.box_end_point = None
 
-    _action_recognition_model = joblib.load(config.action_recognition_model)
+    _action_recognition_model = tf.keras.models.load_model(config.action_recognition_model)
 
     @classmethod
     def for_inference(self, yolo_res):
@@ -57,7 +55,7 @@ class Person:
     def predict_action(self):
         features = self.preprocess()
         features = features.reshape(1, -1)
-        self.action = self._action_recognition_model.predict(features)[0]
+        self.action = self._action_recognition_model.predict(features)[0].argmax()
 
     def draw(self, img, keypoints=False, box=False, text=None):
         if keypoints:
@@ -79,5 +77,5 @@ class Person:
         return img
 
     def write_action(self, img, text):
-        return cv2.putText(img, text, self.box_start_point, cv2.FONT_HERSHEY_SIMPLEX, 1,
-                            (255, 0, 0), 1, cv2.LINE_AA)
+        return cv2.putText(img, text, self.box_start_point, cv2.FONT_HERSHEY_SIMPLEX, 1.5,
+                            (255, 0, 0), 2, cv2.LINE_AA)

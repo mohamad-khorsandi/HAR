@@ -9,6 +9,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 import seaborn as sns
 from tensorflow import keras
 from tensorflow.keras import layers
+import tensorflow as tf
 
 
 class NNModel:
@@ -19,16 +20,17 @@ class NNModel:
 
     @classmethod
     def for_inference(cls, model_file_name):
-        return NNModel(joblib.load(model_file_name))
+        return NNModel(tf.keras.models.load_model(model_file_name))
 
     @classmethod
     def for_train(cls):
         model = keras.Sequential([
-            layers.Input(shape=(34,)),
-
+            layers.Input(shape=(34, 1)),
+            layers.Conv1D(filters=10, kernel_size=3, strides=1, padding='valid', activation='relu'),
+            layers.Flatten(),
+            layers.Dense(128, activation='relu'),
             layers.Dense(64, activation='relu'),
             layers.Dense(32, activation='relu'),
-
             layers.Dense(3, activation='softmax')
         ])
 
@@ -38,8 +40,8 @@ class NNModel:
 
         return NNModel(model)
 
-    def fit(self, x_train, y_train):
-        self._model.fit(x_train, y_train, epochs=10, batch_size=32)
+    def fit(self, x_train, y_train, epochs=10):
+        self._model.fit(x_train, y_train, epochs=epochs, batch_size=32)
 
     def save(self, base_dir):
         path = os.path.join(base_dir, f'mlp{self.accuracy:.2f}')

@@ -25,6 +25,7 @@ def dataset_from_video(video_path, tar):
 
 
 def trim_video(video_path, start_time, end_time, output_path):
+
     clip = VideoFileClip(video_path)
     subclip = clip.subclip(start_time, end_time)
     subclip.write_videofile(output_path, codec='libx264')
