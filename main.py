@@ -27,14 +27,14 @@ def train_network(model_dir):
     x_train, x_test, y_train, y_test = dataset.train_test_split()
 
     model = NNModel.for_train()
-    model.fit(x_train, y_train, epochs=35)
+    model.fit(x_train, y_train, epochs=20)
     model.evaluate(x_test, y_test, dataset.get_label_list())
 
     model.save(model_dir)
 
 
 def test_model(model_filename):
-    dataset = Dataset(utils)
+    dataset = Dataset(config.dataset_path)
     dataset.load()
 
     x_train, y_train, x_test, y_test = dataset.train_test_split(.9)
@@ -43,9 +43,10 @@ def test_model(model_filename):
 
 
 if __name__ == '__main__':
-    # train('models')
-    # dataset = Dataset(config.dataset2_path)
+    # train_svm('models')
+    # dataset = Dataset(config.dataset_path)
     # dataset.add_all_images_to_category('0_sleeping', 'data/pic_data2/sleeping')
+    # video_path = "data/bb.mp4"
     video_path = "rtsp://admin:nimda110@192.168.10.56:554/cam/realmonitor?channel=3&subtype=0"
     action_recognizer = ActionRecognizer()
     action_recognizer.video_inference(video_path)

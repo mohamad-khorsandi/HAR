@@ -7,7 +7,6 @@ from sklearn import svm
 from sklearn.metrics import accuracy_score, confusion_matrix
 import seaborn as sns
 from tensorflow import keras
-from tensorflow.keras import layers
 
 
 class Model:

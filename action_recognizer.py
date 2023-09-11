@@ -24,7 +24,7 @@ class ActionRecognizer:
             # tracker_output_format="visdrone_challenge",
         )
 
-    def video_inference(self, video_path=None):
+    def video_inference(self, video_path=None, write=False):
         cap = None
         if video_path:
             cap = cv2.VideoCapture(video_path)
@@ -32,6 +32,9 @@ class ActionRecognizer:
             cap = cv2.VideoCapture(0)
 
         frame_count = 0
+        out = None
+        if write:
+            out = self.config_writer(cap)
 
         while True:
             ret, frame = cap.read()
@@ -39,15 +42,18 @@ class ActionRecognizer:
             if not ret:
                 break
 
-            if frame_count % 2 != 0:
+            if frame_count % config.playback_frame_skip != 0:
                 continue
 
             self.picture_inference(frame)
             cv2.imshow(self._window_name, frame)
+            if write:
+                out.write(frame)
             key = cv2.waitKey(1)
             if key == 27:
                 break
 
+        # out.release()
         cap.release()
         cv2.destroyAllWindows()
         PersonHistory.report()
@@ -62,7 +68,15 @@ class ActionRecognizer:
 
         for person in action_pic.person_list:
             person.predict_action()
-            frame = person.draw(frame, False, True, self._dataset.labels[person.action])
+            frame = person.draw(frame, True, False, self._dataset.labels[person.action])
 
         PersonHistory.update_boxs_and_frame(tracked_objects)
         PersonHistory.update_action_and_keypoint(action_pic.person_list)
+
+    def config_writer(self, src_cap):
+        fps = int(src_cap.get(cv2.CAP_PROP_FPS))
+        width = int(src_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(src_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+        fourcc = cv2.VideoWriter_fourcc(*'MP4V')
+        return cv2.VideoWriter('out.mp4', fourcc, fps, (width, height))

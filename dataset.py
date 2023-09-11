@@ -22,18 +22,21 @@ class Dataset:
         dataset.load_labels()
         return dataset
 
-    def load(self):
+    def load(self, cat_size=None):
         i = 0
         self._x = []
         self._y = []
-        cat_size = min([len(os.listdir(os.path.join(self.dataset_path, cat_dir))) for cat_dir in os.listdir(self.dataset_path)])
+
+        if cat_size is None:
+            cat_size = min([len(os.listdir(os.path.join(self.dataset_path, cat_dir))) for cat_dir in
+                            os.listdir(self.dataset_path)])
 
         for cat in os.listdir(self.dataset_path):
             cat_num = int(cat.split('_')[0])
             cat_path = os.path.join(self.dataset_path, cat)
-
             keypoints = os.listdir(cat_path)
-            for i in range(cat_size):
+            cat_limit = min(cat_size, len(keypoints))
+            for i in range(cat_limit):
                 person = Person.from_keypoint_path(os.path.join(cat_path, keypoints[i]))
                 features = person.preprocess()
                 self._x.append(features)

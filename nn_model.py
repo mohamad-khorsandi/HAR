@@ -11,6 +11,8 @@ from tensorflow import keras
 from tensorflow.keras import layers
 import tensorflow as tf
 
+import config
+
 
 class NNModel:
     def __init__(self, model):
@@ -25,8 +27,9 @@ class NNModel:
     @classmethod
     def for_train(cls):
         model = keras.Sequential([
-            layers.Input(shape=(34, 1)),
-            layers.Conv1D(filters=10, kernel_size=3, strides=1, padding='valid', activation='relu'),
+            layers.Input(shape=(config.feature_count, 1)),
+            layers.Conv1D(filters=8, kernel_size=2, strides=1, padding='valid', activation='relu'),
+            layers.Conv1D(filters=4, kernel_size=2, strides=1, padding='valid', activation='relu'),
             layers.Flatten(),
             layers.Dense(128, activation='relu'),
             layers.Dense(64, activation='relu'),

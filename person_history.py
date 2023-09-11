@@ -42,7 +42,8 @@ class PersonHistory:
     @classmethod
     def report(cls):
         for _, person_hist in cls.person_history_dict.items():
-            print(person_hist)
+            if len(person_hist.frame) > 5:
+                print(person_hist)
 
     def get_last_xywh(self):
         if len(self.box_xywh_history) == 0:

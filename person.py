@@ -1,5 +1,8 @@
 import copy
+import math
+
 import cv2
+import joblib
 import numpy as np
 import config
 import tensorflow as tf
@@ -14,7 +17,10 @@ class Person:
         self.box_start_point = None
         self.box_end_point = None
 
-    _action_recognition_model = tf.keras.models.load_model(config.action_recognition_model)
+    if config.action_recognition_model.startswith('models/svm'):
+        _action_recognition_model = joblib.load(config.action_recognition_model)
+    else:
+        _action_recognition_model = tf.keras.models.load_model(config.action_recognition_model)
 
     @classmethod
     def for_inference(self, yolo_res):
@@ -23,7 +29,6 @@ class Person:
         box_xyxy = yolo_res.boxes.xyxy[0].numpy().astype(int)
         person.box_start_point = box_xyxy[0:2]
         person.box_end_point = box_xyxy[2:4]
-
         person.box_xywh = yolo_res.boxes.xywh[0].numpy().astype(float)
         return person
 
@@ -50,6 +55,15 @@ class Person:
         # self._feature_list = self._loc_normalization()
         self._feature_list = self._max_normalization()
         self._feature_list = self._flatten()
+        self._feature_list = np.append(self._feature_list, self.angle(12, 14, 16, normalize=True))
+        self._feature_list = np.append(self._feature_list, self.angle(11, 13, 15, normalize=True))
+
+        self._feature_list = np.append(self._feature_list, self.angle(6, 12, 16, normalize=True))
+        self._feature_list = np.append(self._feature_list, self.angle(5, 11, 15, normalize=True))
+
+        self._feature_list = np.append(self._feature_list, self.angle(6, 8, 10, normalize=True))
+        self._feature_list = np.append(self._feature_list, self.angle(5, 7, 9, normalize=True))
+
         return self._feature_list
 
     def predict_action(self):
@@ -71,11 +85,25 @@ class Person:
         return cv2.rectangle(img, self.box_start_point, self.box_end_point, (255, 0, 0), 1)
 
     def draw_keypoints(self, img):
-        for point in self.keypoints:
+        for i, point in enumerate(self.keypoints):
             point = (int(round(point[0])), int(round(point[1])))
             img = cv2.circle(img, point, 2, (0, 0, 255), -1)
+            # img = self.write_action(img, str(i), .3, 1, pos=point)
         return img
 
-    def write_action(self, img, text):
-        return cv2.putText(img, text, self.box_start_point, cv2.FONT_HERSHEY_SIMPLEX, 1.5,
-                            (255, 0, 0), 2, cv2.LINE_AA)
+    def write_action(self, img, text, font_scale=1., thickness=2, pos=None):
+        if pos is None:
+            pos = self.box_start_point
+        return cv2.putText(img, text, pos, cv2.FONT_HERSHEY_SIMPLEX, font_scale,
+                            (0, 255, 0), thickness, cv2.LINE_AA)
+
+    def angle(self, a, b, c, normalize=False):
+        a = self.keypoints[a]
+        b = self.keypoints[b]
+        c = self.keypoints[c]
+
+        ang = math.degrees(math.atan2(c[1] - b[1], c[0] - b[0]) - math.atan2(a[1] - b[1], a[0] - b[0]))
+        ang = ang + 360 if ang < 0 else ang
+        if normalize:
+            ang = ang / 360
+        return ang
