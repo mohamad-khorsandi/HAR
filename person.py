@@ -82,20 +82,19 @@ class Person:
         return img
 
     def draw_rectangle(self, img):
-        return cv2.rectangle(img, self.box_start_point, self.box_end_point, (255, 0, 0), 1)
+        return cv2.rectangle(img, self.box_start_point, self.box_end_point, (255, 0, 0), 3)
 
     def draw_keypoints(self, img):
         for i, point in enumerate(self.keypoints):
             point = (int(round(point[0])), int(round(point[1])))
             img = cv2.circle(img, point, 2, (0, 0, 255), -1)
-            # img = self.write_action(img, str(i), .3, 1, pos=point)
         return img
 
     def write_action(self, img, text, font_scale=1., thickness=2, pos=None):
         if pos is None:
             pos = self.box_start_point
         return cv2.putText(img, text, pos, cv2.FONT_HERSHEY_SIMPLEX, font_scale,
-                            (0, 255, 0), thickness, cv2.LINE_AA)
+                            (0, 0, 255), thickness, cv2.LINE_AA)
 
     def angle(self, a, b, c, normalize=False):
         a = self.keypoints[a]

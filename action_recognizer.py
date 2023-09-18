@@ -73,8 +73,10 @@ class ActionRecognizer:
         PersonHistory.update_boxs_and_frame(tracked_objects)
         PersonHistory.update_action_and_keypoint(action_pic.person_list)
 
-    def config_writer(self, src_cap):
-        fps = int(src_cap.get(cv2.CAP_PROP_FPS))
+    @classmethod
+    def config_writer(cls, src_cap):
+        # fps = int(src_cap.get(cv2.CAP_PROP_FPS))
+        fps = 30
         width = int(src_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(src_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
